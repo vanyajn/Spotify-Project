@@ -21,8 +21,8 @@ A React-based web app that visualizes your Spotify listening history. It display
 ## Technologies
 
 - React
-- Chart.js and chartjs-plugin-datalabels
-- JavaScript (ES6+)
+- Chart.js
+- JavaScript 
 - HTML/CSS
 - Git & GitHub
 
