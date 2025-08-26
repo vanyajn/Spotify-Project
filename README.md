@@ -1,4 +1,4 @@
-# Spotify Stream Visualizer
+# Spotify Data Visualizer
 
 A React-based web app that visualizes your Spotify listening history. It displays the top 5 most streamed artists using interactive pie charts with percentage labels.
 
