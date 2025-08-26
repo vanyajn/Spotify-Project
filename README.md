@@ -13,7 +13,11 @@ A React-based web app that visualizes your Spotify listening history. It display
 - Optimized with React's `useMemo` for efficient rendering.
 
 ---
+## Screenshot
 
+![Spotify Pie Chart Example](PieChart.png)
+
+---
 ## Technologies
 
 - React
@@ -26,4 +30,8 @@ A React-based web app that visualizes your Spotify listening history. It display
 
 ## Installation
 
-1. Clone the repository
+- Clone the repository
+
+
+
+
