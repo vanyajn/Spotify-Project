@@ -10,7 +10,6 @@ A React-based web app that visualizes your Spotify listening history. It display
 - Filter out plays under 30 seconds and identify unique songs.
 - Display a pie chart of the top 5 artists and group the rest as "Other".
 - Interactive chart with legend and percentage labels near the slices.
-- Optimized with React's `useMemo` for efficient rendering.
 
 ---
 ## Screenshot
