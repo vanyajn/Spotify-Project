@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -8,6 +8,8 @@ import {
   Title
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { FiUpload, FiMusic, FiHeadphones, FiBarChart2 } from 'react-icons/fi';
+import './App.css';
 
 // Register Chart.js components and plugins to be used.
 ChartJS.register(ArcElement, Tooltip, Legend, Title, ChartDataLabels);
@@ -15,8 +17,18 @@ ChartJS.register(ArcElement, Tooltip, Legend, Title, ChartDataLabels);
 function App() {
   // State to store the list of unique songs, initialized as an empty array.
   const [uniqueSongs, setUniqueSongs] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [uploadHover, setUploadHover] = useState(false);
   // Ref to access the chart instance directly, if needed.
   const chartRef = useRef(null);
+
+  // Add animation class when component mounts
+  useEffect(() => {
+    document.body.classList.add('loaded');
+    return () => {
+      document.body.classList.remove('loaded');
+    };
+  }, []);
 
   /**
    * Handles the file upload event.
@@ -24,36 +36,34 @@ function App() {
    * A song is considered "played" if its duration (msPlayed) is at least 30 seconds.
    */
   const handleFileUpload = (event) => {
+    setIsLoading(true);
     const file = event.target.files[0];
-    if (!file) return;
+    if (!file) {
+      setIsLoading(false);
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        // Parse the JSON content from the file.
         const data = JSON.parse(e.target.result);
-        // Filter out songs played for less than 30 seconds (30,000 milliseconds).
         const filtered = data.filter(entry => entry.msPlayed >= 30 * 1000);
-
-        // Use a Set to efficiently track and filter for unique songs.
         const seen = new Set();
         const unique = filtered.filter(entry => {
-          // Create a unique key for each song based on its name and artist.
           const songKey = entry.trackName + '___' + entry.artistName;
-          if (seen.has(songKey)) return false; // If seen, skip it.
-          seen.add(songKey); // Otherwise, add it to the Set.
+          if (seen.has(songKey)) return false;
+          seen.add(songKey);
           return true;
         });
-
-        // Update the state with the list of unique songs.
         setUniqueSongs(unique);
       } catch (err) {
-        // Log and alert the user if the file is not a valid JSON.
         console.error('Invalid JSON file', err);
         alert('Please upload a valid Spotify JSON file.');
+      } finally {
+        setIsLoading(false);
       }
     };
-    reader.readAsText(file); // Start reading the file as text.
+    reader.readAsText(file);
   };
 
   /**
@@ -133,45 +143,110 @@ function App() {
   };
 
   return (
-    <div style={{
-      maxWidth: '900px',
-      margin: '40px auto',
-      padding: '20px',
-      textAlign: 'center',
-      fontFamily: 'Arial, sans-serif',
-      borderRadius: '12px'
-    }}>
-      <h1 style={{ marginBottom: '30px' }}>Spotify Stream History</h1>
+    <div className="app-container">
+      <header className="header">
+        <div className="header-icon">
+          <FiHeadphones size={40} />
+        </div>
+        <h1>Spotify Stream History</h1>
+        <p>Discover your listening patterns and explore your favorite artists in style</p>
+      </header>
 
-      {/* File upload section */}
-      <div style={{ marginBottom: '30px' }}>
-        <h2 style={{ marginBottom: '10px' }}>Upload your Spotify JSON</h2>
-        <input type="file" accept=".json" onChange={handleFileUpload} />
+      <div className="upload-section">
+        <div className="upload-icon">
+          <FiUpload size={32} />
+        </div>
+        <h2>Upload Your Listening Data</h2>
+        <p>Simply upload your <code>StreamingHistory.json</code> file to unlock your personalized music insights</p>
+        <div className="file-input">
+          <input 
+            type="file" 
+            id="file-upload" 
+            accept=".json" 
+            onChange={handleFileUpload}
+            disabled={isLoading}
+          />
+          <label 
+            htmlFor="file-upload"
+            onMouseEnter={() => setUploadHover(true)}
+            onMouseLeave={() => setUploadHover(false)}
+            className={isLoading ? 'loading' : ''}
+          >
+            {isLoading ? (
+              <span className="loading-spinner"></span>
+            ) : (
+              <>
+                <FiUpload size={18} style={{ 
+                  transform: uploadHover ? 'translateX(3px)' : 'none',
+                  transition: 'transform 0.3s ease'
+                }} />
+                <span>Choose JSON File</span>
+              </>
+            )}
+          </label>
+          <p className="file-hint">Find this file in your Spotify data download</p>
+        </div>
       </div>
 
-      {/* Display total unique songs count if data is loaded */}
       {uniqueSongs.length > 0 && (
-        <p style={{ marginBottom: '20px', fontSize: '16px', fontWeight: '500' }}>
-          Total unique songs: {uniqueSongs.length}
-        </p>
-      )}
-
-      {/* Pie chart display section */}
-      {uniqueSongs.length > 0 && (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '100%',
-          maxWidth: '900px',
-          margin: 'auto'
-        }}>
-          {/* Chart container with responsive sizing */}
-          <div style={{ flex: 1, maxWidth: '700px', height: '700px' }}>
-            <Pie ref={chartRef} data={pieData} options={pieOptions} />
+        <>
+          <div className="stats-container">
+            <div className="stats-card">
+              <div className="stat-icon">
+                <FiMusic size={24} />
+              </div>
+              <h3>Unique Songs</h3>
+              <p>{uniqueSongs.length.toLocaleString()}</p>
+              <div className="stat-badge">
+                <span>Total</span>
+              </div>
+            </div>
+            
+            <div className="stats-card">
+              <div className="stat-icon">
+                <FiBarChart2 size={24} />
+              </div>
+              <h3>Top Artists</h3>
+              <p>{new Set(uniqueSongs.map(song => song.artistName)).size}</p>
+              <div className="stat-badge">
+                <span>Unique</span>
+              </div>
+            </div>
           </div>
-        </div>
+
+          <div className="chart-container">
+            <Pie 
+              ref={chartRef} 
+              data={pieData} 
+              options={{
+                ...pieOptions,
+                plugins: {
+                  ...pieOptions.plugins,
+                  legend: {
+                    ...pieOptions.plugins.legend,
+                    labels: {
+                      ...pieOptions.plugins.legend.labels,
+                      color: '#b3b3b3',
+                      font: {
+                        size: 14,
+                        family: 'Circular, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif'
+                      }
+                    }
+                  },
+                  title: {
+                    ...pieOptions.plugins.title,
+                    color: '#ffffff',
+                    font: {
+                      size: 22,
+                      weight: 'bold',
+                      family: 'Circular, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif'
+                    }
+                  }
+                }
+              }} 
+            />
+          </div>
+        </>
       )}
     </div>
   );
