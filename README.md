@@ -14,7 +14,7 @@ A React-based web app that visualizes your Spotify listening history. It display
 ---
 ## Screenshot
 
-![Spotify Pie Chart Example](PieChart.png)
+<img width="787" height="588" alt="Screen Shot 2026-03-19 at 8 30 01 PM" src="https://github.com/user-attachments/assets/01b01ca3-542e-4c7a-bf4d-0dfb54f4260f" />
 
 ---
 ## Technologies
